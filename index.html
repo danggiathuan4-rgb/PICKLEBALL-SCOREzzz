@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Bảng điểm Pickleball 🎾</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&family=Montserrat&family=Open+Sans&family=Lobster&family=Raleway&family=Oswald&family=Playfair+Display&family=Quicksand&family=Pacifico&family=Inconsolata&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-family: 'Roboto', sans-serif;
+      --name-bg: #ffffff;
+      --score-bg: #e0f7fa;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background: #f0f4f8;
+      padding: 30px;
+      color: #2c3e50;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .settings {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .settings label {
+      margin-right: 10px;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .team-box {
+      background: var(--name-bg);
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 20px;
+      width: 250px;
+    }
+
+    .team-box input {
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+      border: none;
+      background: transparent;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    .info {
+      font-size: 16px;
+      margin: 6px 0;
+      text-align: center;
+    }
+
+    .score {
+      font-size: 36px;
+      font-weight: bold;
+      text-align: center;
+      background: var(--score-bg);
+      padding: 10px;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+
+    .controls {
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    button {
+      padding: 8px 16px;
+      font-size: 16px;
+      background-color: #2ecc71;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      margin: 5px;
+    }
+
+    button:hover {
+      background-color: #27ae60;
+    }
+
+    select, input[type="color"] {
+      margin: 5px;
+      padding: 5px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Bảng điểm Pickleball 🎾</h2>
+
+  <div class="settings">
+    <label>Chế độ:</label>
+    <select id="mode" onchange="resetGame()">
+      <option value="singles">Đánh đơn</option>
+      <option value="doubles">Đánh đôi</option>
+    </select>
+
+    <label>Font chữ:</label>
+    <select onchange="changeFont(this.value)">
+      <option value="'Roboto', sans-serif">Roboto</option>
+      <option value="'Montserrat', sans-serif">Montserrat</option>
+      <option value="'Open Sans', sans-serif">Open Sans</option>
+      <option value="'Lobster', cursive">Lobster</option>
+      <option value="'Raleway', sans-serif">Raleway</option>
+      <option value="'Oswald', sans-serif">Oswald</option>
+      <option value="'Playfair Display', serif">Playfair Display</option>
+      <option value="'Quicksand', sans-serif">Quicksand</option>
+      <option value="'Pacifico', cursive">Pacifico</option>
+      <option value="'Inconsolata', monospace">Inconsolata</option>
+    </select>
+
+    <label>Màu nền tên đội:</label>
+    <input type="color" onchange="setColor('--name-bg', this.value)">
+    <label>Màu nền điểm:</label>
+    <input type="color" onchange="setColor('--score-bg', this.value)">
+  </div>
+
+  <div class="container">
+    <div class="team-box">
+      <input type="text" id="teamAName" value="Đội A">
+      <div class="info">Người giao: <span id="serverA">—</span></div>
+      <div class="info">Trái banh: <span id="serveA">—</span></div>
+      <div class="score" id="scoreA">0</div>
+      <div class="controls">
+        <button onclick="changeScore('A', 1)">+1</button>
+        <button onclick="changeScore('A', -1)">–1</button>
+      </div>
+    </div>
+
+    <div class="team-box">
+      <input type="text" id="teamBName" value="Đội B">
+      <div class="info">Người giao: <span id="serverB">—</span></div>
+      <div class="info">Trái banh: <span id="serveB">—</span></div>
+      <div class="score" id="scoreB">0</div>
+      <div class="controls">
+        <button onclick="changeScore('B', 1)">+1</button>
+        <button onclick="changeScore('B', -1)">–1</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls" style="text-align:center; margin-top:20px;">
+    <button onclick="switchServe()">Chuyển lượt giao</button>
+    <button onclick="resetGame()">🔄 Reset</button>
+  </div>
+
+  <script>
+    let mode = 'singles';
+    let serveState = 'A';
+    let scoreA = 0;
+    let scoreB = 0;
+
+    function updateServeDisplay() {
+      const serveA = document.getElementById('serveA');
+      const serveB = document.getElementById('serveB');
+      const serverA = document.getElementById('serverA');
+      const serverB = document.getElementById('serverB');
+
+      if (mode === 'singles') {
+        serveA.textContent = serveState === 'A' ? '🎾' : '—';
+        serveB.textContent = serveState === 'B' ? '🎾' : '—';
+        serverA.textContent = serveState === 'A' ? document.getElementById('teamAName').value : '—';
+        serverB.textContent = serveState === 'B' ? document.getElementById('teamBName').value : '—';
+      } else {
+        const serveIcons = {
+          'A1': '🎾',
+          'A2': '🎾🎾',
+          'B1': '🎾',
+          'B2': '🎾🎾'
+        };
+        serveA.textContent = serveState.startsWith('A') ? serveIcons[serveState] : '—';
+        serveB.textContent = serveState.startsWith('B') ? serveIcons[serveState] : '—';
+        serverA.textContent = serveState.startsWith('A') ? serveState : '—';
+        serverB.textContent = serveState.startsWith('B') ? serveState : '—';
+      }
+    }
+
+    function switchServe() {
+      if (mode === 'singles') {
+        serveState = serveState === 'A' ? 'B' : 'A';
+      } else {
+        const nextServe = {
+          'A1': 'A2',
+          'A2': 'B1',
+          'B1': 'B2',
+          'B2': 'A1'
+        };
+        serveState = nextServe[serveState] || 'A1';
+      }
+      updateServeDisplay();
+    }
+
+    function changeScore(team, value) {
+      if (team === 'A') {
+        scoreA = Math.max(0, scoreA + value);
+      } else {
+        scoreB = Math.max(0, scoreB + value);
+      }
+      document.getElementById('scoreA').textContent = scoreA;
+      document.getElementById('scoreB').textContent = scoreB;
+    }
+
+    function resetGame() {
+      mode = document.getElementById('mode').value;
+      serveState = mode === 'singles' ? 'A' : 'A1';
+      scoreA = 0;
+      scoreB = 0;
+      document.getElementBy
